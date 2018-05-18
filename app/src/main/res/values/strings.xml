@@ -1,16 +1,16 @@
 <resources>
     <string name="app_name" translatable="false">Mass Download</string>
-    <string name="channel_download_state">下载状态</string>
-    <string name="notification_downloading">下载</string>
-    <string name="cancel">取消</string>
-    <string name="notification_starting">正在连接服务器</string>
-    <string name="help_text">使用方法：\n
-        在浏览器中点击支持的链接，然后选择用本应用打开\n
-        不支持同时下载多个文件\n
+    <string name="channel_download_state">Download State</string>
+    <string name="notification_downloading">Downloading</string>
+    <string name="cancel">Cancel</string>
+    <string name="notification_starting">Connecting</string>
+    <string name="notification_status">Rate: %s/s Progress: %s/%s Thread: %d/%d</string>
+    <string name="download_success">Download success</string>
+    <string name="download_failed">Download failed</string>
+    <string name="notification_stopping">Cancelling</string>
+    <string name="already_downloading">Another download is in progress</string>
+    <string name="help_text">Usage:\n\n
+        Click supported link in browser, and open it with this app.\n\n
+        I can\'t download multiple files simultaneously.\n\n
     </string>
-    <string name="notification_status">速度：%s/s 进度：%s/%s 线程数：%d/%d</string>
-    <string name="download_success">下载成功</string>
-    <string name="download_failed">下载失败</string>
-    <string name="notification_stopping">正在取消</string>
-    <string name="already_downloading">已有一项下载在进行</string>
 </resources>
