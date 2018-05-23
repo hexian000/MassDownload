@@ -86,7 +86,7 @@ public class Download {
 	public int getHealthyThreadCount() {
 		int healthy = 0;
 		for (Getter getter : getters) {
-			if (getter.isAlive() && !getter.isHealthy()) {
+			if (getter.isAlive() && getter.isHealthy()) {
 				healthy++;
 			}
 		}
