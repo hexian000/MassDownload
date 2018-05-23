@@ -35,6 +35,17 @@ public class Getter extends Thread {
 		connect();
 	}
 
+	@Override
+	protected void finalize() throws Throwable {
+		if (bufferedInputStream != null) {
+			try {
+				bufferedInputStream.close();
+			} catch (IOException ignored) {
+			}
+		}
+		super.finalize();
+	}
+
 	public long getRemainingSize() {
 		return Math.max(endPosition - currentPosition, 0);
 	}
