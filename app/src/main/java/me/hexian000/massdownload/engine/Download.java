@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -45,7 +46,7 @@ public class Download {
 		this.filename = filename;
 		writer = new Writer(64 * 1024 * 1024,
 				new File(path.getPath() + "/" + filename), length);
-		getters = new ArrayList<>();
+		getters = Collections.synchronizedList(new ArrayList<>());
 		forkTimer = new Timer();
 	}
 
@@ -127,20 +128,20 @@ public class Download {
 	}
 
 	public void cancel() {
+		cancelled = true;
+		forkTimer.cancel();
 		synchronized (forkTimer) {
-			cancelled = true;
-			forkTimer.cancel();
-		}
-		for (Getter getter : getters) {
-			getter.interrupt();
+			for (Getter getter : getters) {
+				getter.interrupt();
+			}
 		}
 	}
 
 	public void join() throws InterruptedException {
-		int i = 0;
-		while (i < getters.size()) {
-			getters.get(i).join();
-			i++;
+		synchronized (forkTimer) {
+			for (Getter getter : getters) {
+				getter.join();
+			}
 		}
 		writer.close();
 	}
