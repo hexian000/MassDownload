@@ -141,12 +141,13 @@ public class DownloadService extends Service {
 						lastLength = now;
 						String text = String.format(Locale.getDefault(),
 								getResources().getString(R.string.notification_status),
-								sizeToString(speed), sizeToString(now), sizeToString(length),
+								sizeToString(now), sizeToString(length),
 								download.getHealthyThreadCount(), download.getAliveThreadCount());
 
 						int progress = (int) (now * 1000 / length);
 						builder.setContentTitle(download.getFilename())
 						       .setContentText(text)
+						       .setSubText(sizeToString(speed) + "/s")
 						       .setStyle(new Notification.BigTextStyle().bigText(text))
 						       .setProgress(1000, progress, false);
 						notificationManager.notify(startId, builder.build());

@@ -8,7 +8,7 @@
         在浏览器中点击支持的链接，然后选择用本应用打开\n\n
         不支持同时下载多个文件\n\n
     </string>
-    <string name="notification_status">速度：%s/s 进度：%s/%s 线程数：%d/%d</string>
+    <string name="notification_status">进度：%s/%s 线程数：%d/%d</string>
     <string name="download_success">下载成功</string>
     <string name="download_failed">下载失败</string>
     <string name="notification_stopping">正在取消</string>
