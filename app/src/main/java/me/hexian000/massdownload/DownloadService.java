@@ -35,6 +35,7 @@ public class DownloadService extends Service {
 	private Handler handler;
 	private Notification.Builder builder;
 	private boolean cancelling = false;
+	private int startId;
 
 	@Override
 	public void onCreate() {
@@ -54,6 +55,8 @@ public class DownloadService extends Service {
 			if (download != null) {
 				builder.setContentTitle(getResources().getString(R.string.notification_stopping))
 				       .setContentText("")
+				       .setSubText("")
+				       .setStyle(new Notification.BigTextStyle().bigText(""))
 				       .setProgress(0, 0, true);
 				final Notification notification = builder.build();
 				builder = null;
@@ -67,7 +70,7 @@ public class DownloadService extends Service {
 					Log.d(LOG_TAG, "download cancelled");
 					handler.post(this::stopSelf);
 				}).start();
-				notificationManager.notify(startId, notification);
+				notificationManager.notify(this.startId, notification);
 			}
 			return START_NOT_STICKY;
 		} else if (download != null) {
@@ -120,13 +123,14 @@ public class DownloadService extends Service {
 
 		if (url != null) {
 			final URL finalURL = url;
-			new Thread(() -> this.downloadThread(startId, finalURL)).start();
+			this.startId = startId;
+			new Thread(() -> this.downloadThread(finalURL)).start();
 		}
 
 		return START_NOT_STICKY;
 	}
 
-	private void downloadThread(int startId, @NonNull URL url) {
+	private void downloadThread(@NonNull URL url) {
 		Timer statusTimer = new Timer();
 		boolean failed = true;
 		try {
