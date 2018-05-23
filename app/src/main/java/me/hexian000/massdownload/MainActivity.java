@@ -5,6 +5,9 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
+
+import static me.hexian000.massdownload.DownloadApp.LOG_TAG;
 
 public class MainActivity extends Activity {
 
@@ -16,6 +19,7 @@ public class MainActivity extends Activity {
 		if (uri != null) {
 			String scheme = uri.getScheme();
 			if ("http".equals(scheme) || "https".equals(scheme)) {
+				Log.d(LOG_TAG, "start download: " + uri.toString());
 				Intent intent = new Intent(this, DownloadService.class);
 				intent.setData(uri);
 				startForegroundServiceCompat(intent);
