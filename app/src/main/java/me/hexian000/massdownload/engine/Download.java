@@ -105,17 +105,25 @@ public class Download {
 			Log.d(LOG_TAG, "start fork: " + healthy + "/" + alive);
 			Getter maxGetter = null;
 			long maxRemain = 0;
+			long maxCost = -1;
 			for (Getter getter : getters) {
-				long remain = getter.getRemainingSize();
+				final long remain = getter.getRemainingSize();
+				final long cost = getter.getConnectCost();
 				if (remain > maxRemain) {
 					maxRemain = remain;
 					maxGetter = getter;
 				}
+				if (cost > maxCost) {
+					maxCost = cost;
+				}
 			}
-			if (maxGetter != null && maxRemain > MINIMAL_FORK) {
-				Getter newGetter = maxGetter.fork();
-				if (newGetter != null) {
-					getters.add(newGetter);
+			if (maxCost >= 0 && maxGetter != null && maxRemain > MINIMAL_FORK) {
+				final double timeRemain = (double) maxGetter.getRemainingSize() / maxGetter.getDataRate();
+				if (maxCost < timeRemain / 2) { // worthy to fork
+					Getter newGetter = maxGetter.fork();
+					if (newGetter != null) {
+						getters.add(newGetter);
+					}
 				}
 			}
 		}

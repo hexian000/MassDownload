@@ -22,6 +22,8 @@ public class Getter extends Thread {
 	private boolean healthy;
 	private boolean failed;
 	private BufferedInputStream bufferedInputStream;
+	private long connectCost;
+	private double dataRate;
 
 	Getter(@NonNull URL url, @NonNull Writer writer, long start, long end) {
 		super();
@@ -31,8 +33,27 @@ public class Getter extends Thread {
 		this.writer = writer;
 		healthy = false;
 		failed = false;
+		connectCost = -1;
+		dataRate = 0;
 	}
 
+	/**
+	 * @return connect time cost in millisecond or -1 when data not available
+	 */
+	public long getConnectCost() {
+		return connectCost;
+	}
+
+	/**
+	 * @return data rate in bytes per millisecond
+	 */
+	public double getDataRate() {
+		return dataRate;
+	}
+
+	/**
+	 * @return size in bytes
+	 */
 	public long getRemainingSize() {
 		return Math.max(endPosition - currentPosition, 0);
 	}
@@ -96,10 +117,12 @@ public class Getter extends Thread {
 	}
 
 	private void connect() throws IOException {
+		long start = System.currentTimeMillis();
 		URLConnection urlConnection = url.openConnection();
 		urlConnection.setRequestProperty("Range",
 				"bytes=" + currentPosition + "-" + endPosition);
 		bufferedInputStream = new BufferedInputStream(urlConnection.getInputStream(), BUFFER_SIZE);
+		connectCost = System.currentTimeMillis() - start;
 	}
 
 	private void download() throws IOException, InterruptedException {
@@ -108,10 +131,12 @@ public class Getter extends Thread {
 			if (isInterrupted()) {
 				throw new InterruptedException();
 			}
+			final long start = System.currentTimeMillis();
 			int len = bufferedInputStream.read(buf, 0, BUFFER_SIZE);
 			if (len == -1) {
 				break;
 			} else {
+				dataRate = (double) len / (double) (System.currentTimeMillis() - start);
 				healthy = true;
 				len = (int) Math.min(getRemainingSize(), len);
 				byte[] writeBuf = new byte[len];
