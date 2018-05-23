@@ -1,6 +1,7 @@
 package me.hexian000.massdownload.engine;
 
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,12 +15,15 @@ import java.util.TimerTask;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static me.hexian000.massdownload.DownloadApp.LOG_TAG;
+
 public class Download {
 	private static final int MINIMAL_FORK = 2 * 1024 * 1024; // 2 MiB
 	private final URL url;
 	private final Writer writer;
 	private final long length;
 	private final Timer forkTimer;
+	private final File file;
 	private final String filename;
 	private List<Getter> getters;
 	private boolean cancelled;
@@ -44,8 +48,8 @@ public class Download {
 			}
 		}
 		this.filename = filename;
-		writer = new Writer(64 * 1024 * 1024,
-				new File(path.getPath() + "/" + filename), length);
+		file = new File(path.getPath() + "/" + filename);
+		writer = new Writer(64 * 1024 * 1024, file, length);
 		getters = Collections.synchronizedList(new ArrayList<>());
 		forkTimer = new Timer();
 	}
@@ -96,7 +100,9 @@ public class Download {
 
 	private void smartFork() {
 		int alive = getAliveThreadCount();
-		if (alive < 10 && alive == getHealthyThreadCount()) {
+		int healthy = getHealthyThreadCount();
+		if (alive < 10 && alive == healthy) {
+			Log.d(LOG_TAG, "start fork: " + healthy + "/" + alive);
 			Getter maxGetter = null;
 			long maxRemain = 0;
 			for (Getter getter : getters) {
@@ -150,6 +156,13 @@ public class Download {
 			}
 		}
 		writer.close();
+		if (cancelled) {
+			if (file.delete()) {
+				Log.e(LOG_TAG, "deleted " + filename);
+			} else {
+				Log.e(LOG_TAG, "failed deleting " + filename);
+			}
+		}
 	}
 
 	public boolean isFailed() throws IllegalStateException {
