@@ -34,6 +34,7 @@ public class DownloadService extends Service {
 	private Download download;
 	private Handler handler;
 	private Notification.Builder builder;
+	private boolean cancelling = false;
 
 	@Override
 	public void onCreate() {
@@ -45,21 +46,26 @@ public class DownloadService extends Service {
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		if ("cancel".equals(intent.getAction())) {
+			if (cancelling) {
+				return START_NOT_STICKY;
+			}
+			cancelling = true;
 			if (download != null) {
+				download.cancel();
 				builder.setContentTitle(getResources().getString(R.string.notification_stopping))
 				       .setContentText("")
-				       .setProgress(0, 0, true)
-				       .setActions();
+				       .setProgress(0, 0, true);
 				notificationManager.notify(startId, builder.build());
 				builder = null;
-				download.cancel();
-				try {
-					download.join();
-				} catch (InterruptedException e) {
-					Log.e(LOG_TAG, "error cancelling download", e);
-				}
+				new Thread(() -> {
+					try {
+						download.join();
+					} catch (InterruptedException e) {
+						Log.e(LOG_TAG, "error cancelling download", e);
+					}
+					handler.post(this::stopSelf);
+				}).start();
 			}
-			stopSelf();
 			return START_NOT_STICKY;
 		} else if (download != null) {
 			Toast.makeText(this, R.string.already_downloading, Toast.LENGTH_LONG).show();
