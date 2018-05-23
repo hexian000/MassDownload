@@ -15,7 +15,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Download {
-	private static final int MINIMAL_FORK = 1024 * 1024; // 1 MiB
+	private static final int MINIMAL_FORK = 2 * 1024 * 1024; // 2 MiB
 	private final URL url;
 	private final Writer writer;
 	private final long length;
