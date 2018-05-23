@@ -118,7 +118,8 @@ public class Download {
 				}
 			}
 			if (maxCost >= 0 && maxGetter != null && maxRemain > MINIMAL_FORK) {
-				final double timeRemain = (double) maxGetter.getRemainingSize() / maxGetter.getDataRate();
+				final double timeRemain = (double) maxRemain / maxGetter.getDataRate();
+				Log.d(LOG_TAG, "maxCost: " + maxCost + " timeRemain: " + timeRemain);
 				if (maxCost < timeRemain / 2) { // worthy to fork
 					Getter newGetter = maxGetter.fork();
 					if (newGetter != null) {

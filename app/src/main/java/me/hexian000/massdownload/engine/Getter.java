@@ -64,7 +64,7 @@ public class Getter extends Thread {
 
 	@Nullable
 	public Getter fork() {
-		long pos = getRemainingSize() / 2 + currentPosition;
+		long pos = (endPosition - currentPosition) / 2 + currentPosition;
 		pos -= pos % BUFFER_SIZE;
 		if (pos <= currentPosition + BUFFER_SIZE || pos > endPosition) {
 			return null; // too small to fork!
