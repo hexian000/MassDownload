@@ -49,22 +49,25 @@ public class DownloadService extends Service {
 			if (cancelling) {
 				return START_NOT_STICKY;
 			}
+			Log.d(LOG_TAG, "cancelling");
 			cancelling = true;
 			if (download != null) {
-				download.cancel();
 				builder.setContentTitle(getResources().getString(R.string.notification_stopping))
 				       .setContentText("")
 				       .setProgress(0, 0, true);
-				notificationManager.notify(startId, builder.build());
+				final Notification notification = builder.build();
 				builder = null;
 				new Thread(() -> {
+					download.cancel();
 					try {
 						download.join();
 					} catch (InterruptedException e) {
 						Log.e(LOG_TAG, "error cancelling download", e);
 					}
+					Log.d(LOG_TAG, "download cancelled");
 					handler.post(this::stopSelf);
 				}).start();
+				notificationManager.notify(startId, notification);
 			}
 			return START_NOT_STICKY;
 		} else if (download != null) {

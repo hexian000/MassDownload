@@ -64,7 +64,7 @@ public class Getter extends Thread {
 		Getter getter = null;
 		try {
 			getter = new Getter(url, writer, pos, endPosition);
-			if (currentPosition + BUFFER_SIZE < pos) {
+			if (!isInterrupted() && currentPosition + BUFFER_SIZE < pos) {
 				endPosition = pos;
 				getter.start();
 			} else { // too late, give up

@@ -130,10 +130,8 @@ public class Download {
 	public void cancel() {
 		cancelled = true;
 		forkTimer.cancel();
-		synchronized (forkTimer) {
-			for (Getter getter : getters) {
-				getter.interrupt();
-			}
+		for (Getter getter : getters) {
+			getter.interrupt();
 		}
 	}
 
