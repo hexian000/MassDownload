@@ -55,7 +55,7 @@ public class Download {
 		return filename;
 	}
 
-	public void start() throws IOException {
+	public void start() {
 		Getter getter = new Getter(url, writer, 0, length);
 		getter.start();
 		getters.add(getter);
@@ -136,9 +136,17 @@ public class Download {
 	}
 
 	public void join() throws InterruptedException {
-		synchronized (forkTimer) {
-			for (Getter getter : getters) {
-				getter.join();
+		if (cancelled) {
+			synchronized (forkTimer) {
+				for (Getter getter : getters) {
+					getter.join();
+				}
+			}
+		} else {
+			int i = 0;
+			while (i < getters.size()) {
+				getters.get(i).join();
+				i++;
 			}
 		}
 		writer.close();

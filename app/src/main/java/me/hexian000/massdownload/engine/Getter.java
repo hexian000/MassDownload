@@ -23,7 +23,7 @@ public class Getter extends Thread {
 	private boolean failed;
 	private BufferedInputStream bufferedInputStream;
 
-	Getter(@NonNull URL url, @NonNull Writer writer, long start, long end) throws IOException {
+	Getter(@NonNull URL url, @NonNull Writer writer, long start, long end) {
 		super();
 		this.url = url;
 		currentPosition = start;
@@ -31,19 +31,6 @@ public class Getter extends Thread {
 		this.writer = writer;
 		healthy = false;
 		failed = false;
-
-		connect();
-	}
-
-	@Override
-	protected void finalize() throws Throwable {
-		if (bufferedInputStream != null) {
-			try {
-				bufferedInputStream.close();
-			} catch (IOException ignored) {
-			}
-		}
-		super.finalize();
 	}
 
 	public long getRemainingSize() {
@@ -61,18 +48,9 @@ public class Getter extends Thread {
 		if (pos <= currentPosition + BUFFER_SIZE || pos > endPosition) {
 			return null; // too small to fork!
 		}
-		Getter getter = null;
-		try {
-			getter = new Getter(url, writer, pos, endPosition);
-			if (!isInterrupted() && currentPosition + BUFFER_SIZE < pos) {
-				endPosition = pos;
-				getter.start();
-			} else { // too late, give up
-				getter = null;
-			}
-		} catch (IOException e) {
-			Log.e(LOG_TAG, "fork error", e);
-		}
+		Getter getter = new Getter(url, writer, pos, endPosition);
+		endPosition = pos;
+		getter.start();
 		return getter;
 	}
 
