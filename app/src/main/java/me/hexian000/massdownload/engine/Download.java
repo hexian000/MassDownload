@@ -164,6 +164,7 @@ public class Download {
 				i++;
 			}
 		}
+		forkTimer.cancel();
 		writer.close();
 		if (cancelled) {
 			if (file.delete()) {
